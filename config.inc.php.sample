@@ -1,0 +1,7 @@
+<?php
+define('DOMAIN', 'http://' . (!empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost'));
+define('MAIN_URL', DOMAIN . '/strava/');
+define('CALLBACK_URL', DOMAIN . '/strava/auth.php');
+define('STRAVA_API_ID', '');
+define('STRAVA_API_SECRET', '');
+
