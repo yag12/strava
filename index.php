@@ -1,19 +1,17 @@
 <?php
-session_start();
-
 require_once 'Iamstuartwilson/StravaApi.php';
 require_once 'config.inc.php';
 
 $api = new Iamstuartwilson\StravaApi(STRAVA_API_ID, STRAVA_API_SECRET);
-$strava_access_token = !empty($_SESSION['strava_access_token']) ? $_SESSION['strava_access_token'] : null;
-$strava_refresh_token = !empty($_SESSION['strava_refresh_token']) ? $_SESSION['strava_refresh_token'] : null;
-$strava_expires_at = !empty($_SESSION['strava_expires_at']) ? $_SESSION['strava_expires_at'] : null;
+$strava_access_token = $redis->hget('strava', 'access');
+$strava_refresh_token = $redis->hget('strava', 'refresh');
+$strava_expires_at = $redis->hget('strava', 'expires');
 if(!empty($strava_access_token) && !empty($strava_access_token) && !empty($strava_expires_at)){
 	$api->setAccessToken($strava_access_token, $strava_refresh_token, $strava_expires_at);
 	$response = $api->tokenExchangeRefresh();
-	$_SESSION['strava_access_token'] = $response->access_token;
-	$_SESSION['strava_refresh_token'] = $response->refresh_token;
-	$_SESSION['strava_expires_at'] = $response->expires_at;
+	$redis->hset('strava', 'access', $response->access_token);
+	$redis->hset('strava', 'refresh', $response->refresh_token);
+	$redis->hset('strava', 'expires', $response->expires_at);
 }else{
 	header('Location: ' . CALLBACK_URL);
 }
@@ -66,7 +64,7 @@ if(!empty($lists)){
 	input[type="button"] { width:100%; height:100%; }
 
 	table { float:left; margin:0 16px 0 0; }
-	table tr th { height:36px; text-align:center; background:#7575a3; color:#DDD; padding:0 12px; }
+	table tr th { height:36px; text-align:center; background:#7E8071; color:#DDD; padding:0 12px; }
 	table tr td { height:28px; vertical-align:middle; padding:0 12px; border:1px dashed #AAA; font-size:10pt; }
 	table tr td.btn { height:28px; padding:8px 0 0 0; border:0; }
 	table tr td.none { border:0; }
